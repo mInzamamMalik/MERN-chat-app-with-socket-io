@@ -218,8 +218,16 @@ app.post('/api/v1/message', async (req, res) => {
 app.get('/api/v1/messages/:id', async (req, res) => {
 
     const messages = await messageModel.find({
-        from: req.body.token._id,
-        to: req.params.id
+        $or: [
+            {
+                from: req.body.token._id,
+                to: req.params.id
+            },
+            {
+                from: req.params.id,
+                to: req.body.token._id,
+            }
+        ]
     })
         .populate({ path: 'from', select: 'firstName lastName email' })
         .populate({ path: 'to', select: 'firstName lastName email' })

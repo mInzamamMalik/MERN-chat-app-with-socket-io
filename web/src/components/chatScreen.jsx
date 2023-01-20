@@ -18,6 +18,29 @@ function ChatScreen() {
 
     const [writeMessage, setWriteMessage] = useState("");
     const [conversation, setConversation] = useState(null);
+    const [recipientProfile, setRecipientProfile] = useState({});
+
+    useEffect(() => {
+
+        const getRecipientProfile = async () => {
+            try {
+                let response = await axios.get(
+                    `${state.baseUrl}/profile/${id}`,
+                    {
+                        withCredentials: true
+                    });
+
+                console.log("RecipientProfile: ", response);
+                setRecipientProfile(response.data)
+            } catch (error) {
+                console.log("axios error: ", error);
+            }
+        }
+        getRecipientProfile();
+
+    }, [])
+
+
 
     useEffect(() => {
 
@@ -51,7 +74,8 @@ function ChatScreen() {
 
     return (
         <div>
-            <h1>Chat Screen</h1>
+            <h1>Chat with {recipientProfile?.firstName} {recipientProfile?.firstName}</h1>
+            <span>{recipientProfile?.email}</span>
 
             <form onSubmit={sendMessage}>
                 <input type="text" placeholder='type your message' onChange={(e) => [
