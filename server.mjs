@@ -212,6 +212,8 @@ app.post('/api/v1/message', async (req, res) => {
         text: req.body.text
     })
 
+    console.log("channel: ", `${req.body.to}-${req.body.token._id}`);
+
     io.emit(`${req.body.to}-${req.body.token._id}`, sent)
 
     console.log("sent: ", sent)
@@ -288,14 +290,14 @@ io.on("connection", (socket) => {
 // to emit data to a certain client
 //  connectedUsers[0].emit("topic 1", "some data")
 
-setInterval(() => {
+// setInterval(() => {
 
-    // to emit data to all connected client
-    // first param is topic name and second is json data
-    io.emit("Test topic", { event: "ADDED_ITEM", data: "some data" });
-    console.log("emiting data to all client");
+//     // to emit data to all connected client
+//     // first param is topic name and second is json data
+//     io.emit("Test topic", { event: "ADDED_ITEM", data: "some data" });
+//     console.log("emiting data to all client");
 
-}, 2000)
+// }, 2000)
 
 
 

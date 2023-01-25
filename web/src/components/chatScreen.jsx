@@ -59,6 +59,7 @@ function ChatScreen() {
         });
 
 
+        console.log("subscribed: ", `${state.user._id}-${id}`);
         socket.on(`${state.user._id}-${id}`, function (data) {
 
 
