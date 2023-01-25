@@ -260,7 +260,7 @@ app.use('*', express.static(path.join(__dirname, './web/build')))
 const server = createServer(app);
 
 // handing over server access to socket.io
-let io = new socketIo(server, { cors: { origin: "*", methods: "*", } });
+const io = new socketIo(server, { cors: { origin: "*", methods: "*", } });
 
 server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
