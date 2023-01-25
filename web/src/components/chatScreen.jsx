@@ -6,7 +6,7 @@ import { GlobalContext } from './../context/Context';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { useParams } from "react-router-dom";
-
+import "./chatScreen.css"
 
 import "./userList.css"
 
@@ -20,42 +20,43 @@ function ChatScreen() {
     const [conversation, setConversation] = useState(null);
     const [recipientProfile, setRecipientProfile] = useState({});
 
-    useEffect(() => {
+    const getMessages = async () => {
+        try {
+            const response = await axios.get(`${state.baseUrl}/messages/${id}`)
+            console.log("response: ", response.data);
+            setConversation(response.data)
 
-        const getRecipientProfile = async () => {
-            try {
-                let response = await axios.get(
-                    `${state.baseUrl}/profile/${id}`,
-                    {
-                        withCredentials: true
-                    });
-
-                console.log("RecipientProfile: ", response);
-                setRecipientProfile(response.data)
-            } catch (error) {
-                console.log("axios error: ", error);
-            }
+        } catch (error) {
+            console.log("error in getting all tweets", error);
         }
+    }
+    const getRecipientProfile = async () => {
+        try {
+            let response = await axios.get(
+                `${state.baseUrl}/profile/${id}`,
+                {
+                    withCredentials: true
+                });
+
+            console.log("RecipientProfile: ", response);
+            setRecipientProfile(response.data)
+        } catch (error) {
+            console.log("axios error: ", error);
+        }
+    }
+
+
+    useEffect(() => {
+     
         getRecipientProfile();
-
-    }, [])
-
-
-
-    useEffect(() => {
-
-        const getMessages = async () => {
-            try {
-                const response = await axios.get(`${state.baseUrl}/messages/${id}`)
-                console.log("response: ", response.data);
-                setConversation(response.data)
-
-            } catch (error) {
-                console.log("error in getting all tweets", error);
-            }
-        }
         getMessages();
+
     }, [])
+   
+
+    
+
+
 
     const sendMessage = async (e) => {
         if (e) e.preventDefault();
@@ -66,6 +67,7 @@ function ChatScreen() {
                 text: writeMessage,
             })
             console.log("response: ", response.data);
+            getMessages();
         } catch (error) {
             console.log("error in getting all tweets", error);
         }
@@ -84,18 +86,30 @@ function ChatScreen() {
                 <button type="submit">Send</button>
             </form>
 
-            {(conversation?.length) ?
-                conversation?.map((eachMessage, index) => {
-                    return <div key={index}>
-                        <h2>{eachMessage.from.firstName} {eachMessage.from.lastName}</h2>
-                        <span>{moment(eachMessage.createdOn).fromNow()}</span>
-                        <p>{eachMessage.text}</p>
-                    </div>
-                })
-                : null
-            }
+            <div className='messageView'>
+
+                {(conversation?.length) ?
+                    conversation?.map((eachMessage, index) => {
+                        const className = (eachMessage.from._id === id) ? "recipientMessage" : "myMessage"
+
+                        return <div
+                            key={index}
+                            className={`message ${className}`}>
+                            <div className='head'>
+                                <div className='name' >{eachMessage.from.firstName} {eachMessage.from.lastName}</div>
+                                <div className='time' >{moment(eachMessage.createdOn).fromNow()}</div>
+                            </div>
+                            <div className='text' >{eachMessage.text}</div>
+                        </div>
+
+                    })
+                    : null
+                }
+            </div>
+
             {(conversation?.length === 0 ? "No Messages found" : null)}
             {(conversation === null ? "Loading..." : null)}
+
 
         </div>
     );

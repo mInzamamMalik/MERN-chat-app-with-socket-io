@@ -22,6 +22,7 @@
     "multer": "*",
     "nanoid": "^4.0.0",
     "postmark": "^3.0.15",
+    "socket.io": "^4.5.4",
     "twilio": "^3.84.1"
   }
 }
