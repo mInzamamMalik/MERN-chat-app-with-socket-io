@@ -6,9 +6,10 @@ import { GlobalContext } from './../context/Context';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { useParams } from "react-router-dom";
-import "./chatScreen.css"
+import io from 'socket.io-client';
 
-import "./userList.css"
+
+import "./chatScreen.css"
 
 function ChatScreen() {
 
@@ -47,14 +48,43 @@ function ChatScreen() {
 
 
     useEffect(() => {
-     
+
+        const socket = io("http://localhost:5001"); // to connect with locally running Socker.io server
+
+        socket.on('connect', function () {
+            console.log("connected")
+        });
+        socket.on('disconnect', function (message) {
+            console.log("Socket disconnected from server: ", message);
+        });
+
+
+        socket.on(`${state.user._id}-${id}`, function (data) {
+
+
+            console.log(data);
+
+            // setConversation(data)
+
+
+        });
+
+
+        return () => {
+            socket.close();
+        }
+
+    }, [])
+
+    useEffect(() => {
+
         getRecipientProfile();
         getMessages();
 
     }, [])
-   
 
-    
+
+
 
 
 
