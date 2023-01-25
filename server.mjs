@@ -88,7 +88,7 @@ const getUser = async (req, res) => {
     }
 
     try {
-        const user = await userModel.findOne({ _id: _id }, "email firstName lastName -_id").exec()
+        const user = await userModel.findOne({ _id: _id }, "email firstName lastName _id").exec()
         if (!user) {
             res.status(404).send({})
             return;
