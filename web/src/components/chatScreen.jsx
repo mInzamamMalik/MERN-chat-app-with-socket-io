@@ -49,7 +49,9 @@ function ChatScreen() {
 
     useEffect(() => {
 
-        const socket = io(state.baseUrlSocketIo); // to connect with locally running Socker.io server
+        const socket = io(state.baseUrlSocketIo, {
+            withCredentials: true
+        });
 
         socket.on('connect', function () {
             console.log("connected")

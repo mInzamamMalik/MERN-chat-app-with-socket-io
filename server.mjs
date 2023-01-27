@@ -12,6 +12,7 @@ import { stringToHash, varifyHash } from 'bcrypt-inzi';
 
 import { Server as socketIo } from 'socket.io';
 import { createServer } from "http";
+import cookie from 'cookie';
 
 
 
@@ -254,11 +255,6 @@ app.get('/api/v1/messages/:id', async (req, res) => {
 })
 
 
-
-
-
-
-
 const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, './web/build')))
 app.use('*', express.static(path.join(__dirname, './web/build')))
@@ -270,7 +266,12 @@ app.use('*', express.static(path.join(__dirname, './web/build')))
 const server = createServer(app);
 
 // handing over server access to socket.io
-const io = new socketIo(server, { cors: { origin: "*", methods: "*", } });
+const io = new socketIo(server, {
+    cors: {
+        origin: ["http://localhost:3000", 'https://mern-chat-app-inzamam.up.railway.app'],
+        credentials: true
+    }
+});
 
 server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
@@ -282,6 +283,34 @@ server.listen(port, () => {
 
 io.on("connection", (socket) => {
     console.log("New client connected with id: ", socket.id);
+
+    if (typeof socket?.request?.headers?.cookie !== "string") {
+        console.log("cookie was not found");
+        socket.disconnect(true)
+        return;
+    }
+
+    let cookieData = cookie.parse(socket?.request?.headers?.cookie);
+    console.log("cookieData: ", cookieData);
+
+    if (!cookieData?.Token) {
+        console.log("Token not found in cookie");
+        socket.disconnect(true)
+        return;
+    }
+
+    jwt.verify(cookieData?.Token, SECRET, function (err, decodedData) {
+        if (!err) {
+            console.log("decodedData: ", decodedData);
+            const nowDate = new Date().getTime() / 1000;
+            if (decodedData.exp < nowDate) {
+                socket.disconnect(true)
+            }
+        } else {
+            socket.disconnect(true)
+        }
+    });
+
 
     // to emit data to a certain client
     socket.emit("topic 1", "some data")
