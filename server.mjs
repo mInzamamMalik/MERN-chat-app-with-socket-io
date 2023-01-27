@@ -214,9 +214,17 @@ app.post('/api/v1/message', async (req, res) => {
 
     console.log("channel: ", `${req.body.to}-${req.body.token._id}`);
 
-    io.emit(`${req.body.to}-${req.body.token._id}`, sent)
+    const populatedMessage = await messageModel
+        .findById(sent._id)
+        .populate({ path: 'from', select: 'firstName lastName email' })
+        .populate({ path: 'to', select: 'firstName lastName email' })
+        .exec();
 
-    console.log("sent: ", sent)
+
+    io.emit(`${req.body.to}-${req.body.token._id}`, populatedMessage)
+    io.emit(`personal-channel-${req.body.to}`, populatedMessage)
+
+    console.log("populatedMessage: ", populatedMessage)
 
     res.send("message sent successfully");
 })

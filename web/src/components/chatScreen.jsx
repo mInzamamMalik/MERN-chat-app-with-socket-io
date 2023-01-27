@@ -6,7 +6,7 @@ import { GlobalContext } from './../context/Context';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { useParams } from "react-router-dom";
-import io from 'socket.io-client';
+import { io } from "socket.io-client";
 
 
 import "./chatScreen.css"
@@ -49,7 +49,7 @@ function ChatScreen() {
 
     useEffect(() => {
 
-        const socket = io(`${state.baseUrl}`); // to connect with locally running Socker.io server
+        const socket = io(state.baseUrlSocketIo); // to connect with locally running Socker.io server
 
         socket.on('connect', function () {
             console.log("connected")
@@ -57,17 +57,15 @@ function ChatScreen() {
         socket.on('disconnect', function (message) {
             console.log("Socket disconnected from server: ", message);
         });
-
+        socket.on("connect_error", (err) => {
+            console.log(`connect_error due to ${err.message}`);
+        });
 
         console.log("subscribed: ", `${state.user._id}-${id}`);
         socket.on(`${state.user._id}-${id}`, function (data) {
 
-
             console.log(data);
-
-            // setConversation(data)
-
-
+            setConversation(prev => [data, ...prev])
         });
 
 
